@@ -7,7 +7,7 @@
   "scripts": {
     "dev": "cross-env NODE_ENV=development nodemon ./src/main.js",
     "start": "cross-env NODE_ENV=production node ./src/main.js",
-    "start_prod": "pm2 start ecosystem.config.js --env production"
+    "start_prod": "pm2 start ecosystem.config.cjs --env production"
   },
   "keywords": [],
   "author": "",
