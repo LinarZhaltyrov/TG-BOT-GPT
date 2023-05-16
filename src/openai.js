@@ -5,17 +5,17 @@ import { removeFile } from "./utils.js"
 
 
 class OpenAI {
+    roles = {
+        USER: 'user',
+        SYSTEM: 'system',
+        ASSISTANT: 'assistant'
+    }
+
     constructor(apiKey) {
         const configuration = new Configuration({
             apiKey,
         })
         this.openai = new OpenAIApi(configuration);
-    }
-
-    roles = {
-        USER: 'user',
-        SYSTEM: 'system',
-        ASSISTANT: 'assistant'
     }
 
     async chat(messages) {
@@ -25,7 +25,7 @@ class OpenAI {
                 messages,
 
             })
-            
+
             return response.data.choices[0].message
         } catch (err) {
             console.log('Error in openai chat:', err.message);
@@ -34,7 +34,7 @@ class OpenAI {
 
     async transcription(mp3FilePath) {
         try {
-            const response =  await this.openai.createTranscription(
+            const response = await this.openai.createTranscription(
                 createReadStream(mp3FilePath),
                 'whisper-1'
             )
