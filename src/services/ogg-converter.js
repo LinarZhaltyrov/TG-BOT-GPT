@@ -4,7 +4,7 @@ import { dirname, resolve } from "path"
 import { fileURLToPath } from "url"
 import ffmpeg from "fluent-ffmpeg"
 import installer from "@ffmpeg-installer/ffmpeg"
-import { removeFile } from "./utils.js"
+import { removeFile } from "../utils.js"
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
@@ -15,7 +15,7 @@ class OggConverter {
 
     async getOggFile(url, fileName) {
         try {
-            const oggFilePath = resolve(__dirname, '../voices', `${fileName}.ogg`)
+            const oggFilePath = resolve(__dirname, '../../voices', `${fileName}.ogg`)
             const file = await axios({
                 method: 'get',
                 url,
@@ -38,7 +38,7 @@ class OggConverter {
 
     async convertOggToMP3(inputFilePath, outputFileName) {
         try {
-            const outputFilePath = resolve(__dirname, '../voices', `${outputFileName}.mp3`)
+            const outputFilePath = resolve(__dirname, '../../voices', `${outputFileName}.mp3`)
             const result = new Promise((resolve, reject) => {
                 ffmpeg(inputFilePath)
                 .inputOption('-t 30')

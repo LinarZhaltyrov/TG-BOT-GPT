@@ -1,7 +1,7 @@
 import { Configuration, OpenAIApi } from "openai"
 import config from "config"
 import { createReadStream } from "fs"
-import { removeFile } from "./utils.js"
+import { removeFile } from "../utils.js"
 
 
 class OpenAI {
