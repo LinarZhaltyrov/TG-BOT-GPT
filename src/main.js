@@ -1,9 +1,7 @@
-import { Telegraf, session } from "telegraf"
-import { message } from "telegraf/filters"
-import { code } from "telegraf/format"
+import { Telegraf, session, Scenes } from "telegraf"
 import config from "config"
-import { oggConverter } from "./ogg-converter.js"
-import { openai } from "./openai.js"
+import chatScene from './scenes/chatScene.js'
+import imageScene from './scenes/imageScene.js'
 
 console.log('ENV:', config.get('ENV'));
 
@@ -12,73 +10,41 @@ const SESSION_DATA = {
 }
 
 
+const { enter, leave } = Scenes.Stage
+
 const bot = new Telegraf(config.get('TG_BOT_API_TOKEN'))
 
+const stage = new Scenes.Stage([chatScene, imageScene]);
+
 bot.use(session())
+bot.use(stage.middleware())
+bot.use((ctx, next) => {
+    ctx.scene.session.myData ??= SESSION_DATA
+    return next()
+})
+
 
 bot.command('start', async (ctx) => {
-    ctx.session = SESSION_DATA
-    await ctx.reply('Этот бот может принимать голосовые и текстовые сообщения. Ваш запрос будет отправлен в ChatGPT, после обработки вы получите ответ.')
+    await ctx.reply(`Этот бот может принимать голосовые и текстовые сообщения. 
+    Ваш запрос будет отправлен в ChatGPT, после обработки вы получите ответ. 
+    Вы можете общаться с ботом, а так же создавать изображения по описанию.`)
 })
 
-bot.command('newchat', async (ctx) => {
-    ctx.session = SESSION_DATA
-    await ctx.reply('Начнем новый чат, отправьте голосовое или текстовое сообщение')
+bot.command('help', async (ctx) => {
+    await ctx.reply(`У днного бота есть несколько режмов работы; 
+    \n 1) GPTChat - для входа в этот режим используй комманду /newchat 
+    \n 2) Создание изображений по описанию - для входя в этот режим используй комману /createimage 
+    \n\n для выхода из режима используй комманду /exit`)
 })
 
-bot.on(message('voice'), async (ctx) => {
-    ctx.session ??= SESSION_DATA
-    try {
-        await ctx.reply(code('Сообщение принято.'))
-
-        const link = await ctx.telegram.getFileLink(ctx.message.voice.file_id)
-        const userID = String(ctx.message.from.id)
-
-        const oggFilePath = await oggConverter.getOggFile(link, userID)
-        const mp3FilePath = await oggConverter.convertOggToMP3(oggFilePath, userID)
-
-        const textFromVoice = await openai.transcription(mp3FilePath)
-
-        await ctx.reply(code(`Думаю. Ожидайте ответа. Ваш запрос: ${textFromVoice}`))
-
-        ctx.session.messages.push({
-            role: openai.roles.USER,
-            content: textFromVoice
-        })
-
-        const GPTAnswer = await openai.chat(ctx.session.messages)
-
-        ctx.session.messages.push({
-            role: openai.roles.ASSISTANT,
-            content: GPTAnswer.content
-        })
-        await ctx.reply(GPTAnswer.content)
-    } catch (err) {
-        console.log('Error in voice message:', err.message);
-    }
+bot.command("newchat", async (ctx) => {
+    await ctx.scene.enter("newchat")
 })
 
-bot.on(message('text'), async (ctx) => {
-    ctx.session ??= SESSION_DATA
-    try {
-        await ctx.reply(code('Сообщение принято. Ожидайте ответа'))
-
-        ctx.session.messages.push({
-            role: openai.roles.USER,
-            content: ctx.message.text
-        })
-
-        const GPTAnswer = await openai.chat(ctx.session.messages)
-
-        ctx.session.messages.push({
-            role: openai.roles.ASSISTANT,
-            content: GPTAnswer.content
-        })
-        await ctx.reply(GPTAnswer.content)
-    } catch (err) {
-        console.log('Error in text message:', err.message);
-    }
+bot.command("createimage", async (ctx) => {
+    await ctx.scene.enter("createimage")
 })
+
 
 bot.launch()
 
