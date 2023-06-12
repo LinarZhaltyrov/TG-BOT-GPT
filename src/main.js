@@ -30,6 +30,13 @@ bot.command('start', async (ctx) => {
     Вы можете общаться с ботом, а так же создавать изображения по описанию.`)
 })
 
+bot.command('help', async (ctx) => {
+    await ctx.reply(`У днного бота есть несколько режмов работы; 
+    \n 1) GPTChat - для входа в этот режим используй комманду /newchat 
+    \n 2) Создание изображений по описанию - для входя в этот режим используй комману /createimage 
+    \n\n для выхода из режима используй комманду /exit`)
+})
+
 bot.command("newchat", async (ctx) => {
     await ctx.scene.enter("newchat")
 })
