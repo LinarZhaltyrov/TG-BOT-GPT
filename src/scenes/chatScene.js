@@ -9,7 +9,7 @@ const { enter, leave } = Scenes.Stage
 const chatGPTScene = new Scenes.BaseScene("newchat")
 
 chatGPTScene.enter(ctx => ctx.reply("Привет, отправь голосовое сообщение, либо напиши боту свой вопрос"))
-chatGPTScene.leave(ctx => ctx.reply("Пока Пока"))
+chatGPTScene.leave(ctx => ctx.reply("Вы покинули режим ChatGPT. Пока Пока"))
 
 chatGPTScene.command('exit', leave())
 
@@ -31,15 +31,16 @@ chatGPTScene.on(message('voice'), async (ctx) => {
             role: openai.roles.USER,
             content: textFromVoice
         })
-       
-        const GPTAnswer = await openai.chat(ctx.scene.session.myData.messages)
 
+        const GPTAnswer = await openai.chat(ctx.scene.session.myData.messages)
+        console.log(`Ответ от бота на голосовой запрос получен: ${!!GPTAnswer.content}`);
         ctx.scene.session.myData.messages.push({
             role: openai.roles.ASSISTANT,
             content: GPTAnswer.content
         })
         await ctx.reply(GPTAnswer.content)
     } catch (err) {
+        await ctx.reply(code(`Упс! Произошла ошибка.`))
         console.log('Error in voice message:', err.message);
     }
 })
@@ -47,22 +48,22 @@ chatGPTScene.on(message('voice'), async (ctx) => {
 chatGPTScene.on(message('text'), async (ctx) => {
     try {
         await ctx.reply(code('Сообщение принято. Ожидайте ответа'))
-        
+
         ctx.scene.session.myData.messages.push({
             role: openai.roles.USER,
             content: ctx.message.text
         })
-       
+
         const GPTAnswer = await openai.chat(ctx.scene.session.myData.messages)
-       
+        console.log(`Ответ от бота на текстовый запрос получен: ${!!GPTAnswer.content}`);
         ctx.scene.session.myData.messages.push({
             role: openai.roles.ASSISTANT,
             content: GPTAnswer.content
         })
-        
+
         await ctx.reply(GPTAnswer.content)
     } catch (err) {
-        console.log(err);
+        await ctx.reply(code(`Упс! Произошла ошибка.`))
         console.log('Error in text message:', err.message);
     }
 })

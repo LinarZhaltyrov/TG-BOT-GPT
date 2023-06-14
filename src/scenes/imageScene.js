@@ -65,7 +65,6 @@ createImageScene.on(message('text'), async (ctx) => {
 
         await ctx.reply(imageCreatorResp)
     } catch (err) {
-        console.log(err);
         console.log('Error in text message image generator:', err.message);
     }
 })
