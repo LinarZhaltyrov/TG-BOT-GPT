@@ -12,8 +12,7 @@ export async function removeFile(path) {
 
 export async function restartCommand() {
     try {
-        execSync(`echo ${config.get('SUDO_PASS')} | sudo su`)
-
+        execSync(`echo ${config.get('SUDO_PASS')} | sudo su "pm2 restart GPT-BOT"`)
         const result = execSync("pm2 restart GPT-BOT").toString()
         return result
     } catch (err) {
