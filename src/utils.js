@@ -1,6 +1,6 @@
 import { unlink } from "fs/promises"
 import { exec, execSync } from "child_process"
-import config from "../config"
+import config from "config"
 
 export async function removeFile(path) {
     try {
