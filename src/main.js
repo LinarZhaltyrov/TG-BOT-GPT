@@ -2,7 +2,6 @@ import { Telegraf, session, Scenes } from "telegraf"
 import config from "config"
 import chatScene from './scenes/chatScene.js'
 import imageScene from './scenes/imageScene.js'
-import { restartCommand } from './utils.js'
 
 console.log('ENV:', config.get('ENV'));
 
@@ -44,16 +43,6 @@ bot.command("newchat", async (ctx) => {
 
 bot.command("createimage", async (ctx) => {
     await ctx.scene.enter("createimage")
-})
-
-bot.command("restart", async (ctx) => {
-    const commandResult = await restartCommand()
-
-    if (!commandResult) {
-        return await ctx.reply(`Произошла ошибка при выполнении команды`)
-    }
-
-    await ctx.reply(`Перезапускаю бота`)
 })
 
 
