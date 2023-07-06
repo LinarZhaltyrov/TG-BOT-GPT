@@ -25,7 +25,7 @@ chatGPTScene.on(message('voice'), async (ctx) => {
 
         const textFromVoice = await openai.transcription(mp3FilePath)
 
-        await ctx.reply(code(`Думаю. Ожидайте ответа. Ваш запрос: ${textFromVoice}, символов ${textFromVoice?.length}`))
+        await ctx.reply(code(`Думаю. Ожидайте ответа. Ваш запрос: ${textFromVoice} (${textFromVoice?.length} символов)`))
 
         ctx.scene.session.myData.messages.push({
             role: openai.roles.USER,
@@ -47,7 +47,7 @@ chatGPTScene.on(message('voice'), async (ctx) => {
 
 chatGPTScene.on(message('text'), async (ctx) => {
     try {
-        await ctx.reply(code(`Сообщение принято. Ожидайте ответа, ${ctx.message.text.length} символов`))
+        await ctx.reply(code(`Сообщение принято (${ctx.message.text.length} символов). Ожидайте ответа`))
 
         const userID = String(ctx.message.from.id)
 
